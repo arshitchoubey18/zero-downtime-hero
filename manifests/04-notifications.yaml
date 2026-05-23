@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: argo-rollouts-notification-secret
+  namespace: argo-rollouts
+type: Opaque
+stringData:
+  slack-token: "xoxb-YOUR-SLACK-BOT-TOKEN"
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ConfigMap
+metadata:
+  name: argo-rollouts-notifications-cm
+  namespace: argo-rollouts
+data:
+  service.slack: |
+    token: $slack-token
+  template.app-deployed: |
+    message: |
+      {{.rollout.metadata.name}} {{.rollout.status.currentPodHash}} promoted to {{.rollout.status.stableRS}}
+  template.app-degraded: |
+    message: |
+      🚨 {{.rollout.metadata.name}} ROLLED BACK! Error rate >1% at weight {{.rollout.status.canary.weight}}%
+  trigger.on-rollout-completed: |
+    - when: rollout.status.phase == "Healthy"
+      send: [app-deployed]
+  trigger.on-rollout-aborted: |
+    - when: rollout.status.phase == "Degraded"
+      send: [app-degraded]

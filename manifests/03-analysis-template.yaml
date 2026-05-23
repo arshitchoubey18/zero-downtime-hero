@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: success-rate
+  namespace: production
+spec:
+  args:
+  - name: service-name
+  - name: namespace
+  metrics:
+  - name: error-rate
+    interval: 30s
+    count: 5
+    successCondition: result[0] <= 0.01
+    failureCondition: result[0] > 0.01
+    provider:
+      prometheus:
+        address: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          sum(rate(http_requests_total{namespace="{{args.namespace}}",app="{{args.service-name}}",status=~"5.."}[2m]))
+          /
+          sum(rate(http_requests_total{namespace="{{args.namespace}}",app="{{args.service-name}}"}[2m]))
+  - name: p95-latency
+    interval: 30s
+    successCondition: result[0] < 0.3
+    provider:
+      prometheus:
+        address: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket{namespace="{{args.namespace}}",app="{{args.service-name}}"}[2m])) by (le)
+          )

@@ -1,0 +1,38 @@
+apiVersion: flagger.app/v1beta1
+kind: Canary
+metadata:
+  name: demo-api
+  namespace: production
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: demo-api
+  service:
+    port: 80
+    targetPort: 8080
+  analysis:
+    interval: 30s
+    threshold: 3
+    maxWeight: 50
+    stepWeight: 10
+    metrics:
+    - name: error-rate
+      templateRef:
+        name: error-rate
+        namespace: istio-system
+      thresholdRange:
+        max: 1
+    - name: latency
+      templateRef:
+        name: latency
+        namespace: istio-system
+      thresholdRange:
+        max: 300
+    webhooks:
+    - name: load-test
+      type: pre-rollout
+      url: http://flagger-loadtester.test/
+      timeout: 5s
+      metadata:
+        cmd: "hey -z 1m -q 10 -c 2 http://demo-api-canary.production/api"
