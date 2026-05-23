@@ -1,6 +1,4 @@
-# Project 86 — Zero Downtime Hero
-
-**Day 86/100 of #100DaysOfDevOps**
+# Project — Zero Downtime Hero
 
 > Broke production on purpose. Users felt nothing.
 
@@ -108,7 +106,7 @@ kubectl argo rollouts undo demo-api -n production
 
 ---
 
-## 💡 What I Learned (Interview Gold)
+## 💡 What I Learned 
 
 1. **Canary ≠ RollingUpdate** — RollingUpdate kills old pods. Canary keeps them alive until new is healthy.
 2. **ActualWeight is truth** — SetWeight is desired, ActualWeight is real traffic. Argo won't send traffic to unready pods.
@@ -134,7 +132,7 @@ kubectl argo rollouts undo demo-api -n production
 
 ---
 
-## 🎤 Interview Talking Points
+## 🎤 The Talking Points
 
 **Q: How do you do zero-downtime deployments?**
 > "I use Argo Rollouts canary. In Project 86, I proved it by deploying a broken image. The rollout detected ImagePullBackOff, kept ActualWeight at 0%, and stable pods served 100% traffic. Screenshots in repo."
@@ -156,16 +154,8 @@ kubectl argo rollouts undo demo-api -n production
 
 ---
 
-## 📅 100DaysOfDevOps Journey
-- Day 84: Jenkins CI/CD
-- Day 85: Helm Charts
-- **Day 86: Zero-Downtime (this)**
-- Day 87: ArgoCD GitOps (next)
-
----
-
 ## 🤝 Connect
-Built by **Arshit Choubey** — DevOps Engineer in training  
+Built by **Arshit Choubey** — DevOps Engineer 
 Bangalore, India
 
 > Star the repo if this helped you understand canary deployments!
